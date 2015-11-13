@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM ubuntu:trusty
 
 RUN apt-get update && apt-get -y install  unzip \
                         xz-utils \
@@ -18,6 +18,9 @@ RUN apt-get update && apt-get -y install  unzip \
                         automake \
                         pkg-config \
                         p7zip-full
+
+# Install Chef Client
+RUN curl -L https://getchef.com/chef/install.sh | bash -s -- -v <%= version %> -P container
 
 # https://www.kernel.org/
 ENV KERNEL_VERSION  4.1.13
