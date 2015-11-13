@@ -1,4 +1,4 @@
-FROM ubuntu:trusty
+FROM ubuntu:vivid
 
 RUN apt-get update && apt-get -y install  unzip \
                         xz-utils \
