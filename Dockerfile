@@ -146,26 +146,27 @@ RUN for dep in $TCZ_DEPS; do \
 RUN curl -fL -o $ROOTFS/usr/local/bin/generate_cert https://github.com/SvenDowideit/generate_cert/releases/download/0.2/generate_cert-0.2-linux-amd64 && \
     chmod +x $ROOTFS/usr/local/bin/generate_cert
 
+### Removing VBox Guest Additions. Not Needed.
 # Build VBox guest additions
-ENV VBOX_VERSION 5.0.10
-RUN mkdir -p /vboxguest && \
-    cd /vboxguest && \
-    \
-    curl -fL -o vboxguest.iso http://download.virtualbox.org/virtualbox/${VBOX_VERSION}/VBoxGuestAdditions_${VBOX_VERSION}.iso && \
-    7z x vboxguest.iso -ir'!VBoxLinuxAdditions.run' && \
-    rm vboxguest.iso && \
-    \
-    sh VBoxLinuxAdditions.run --noexec --target . && \
-    mkdir amd64 && tar -C amd64 -xjf VBoxGuestAdditions-amd64.tar.bz2 && \
-    rm VBoxGuestAdditions*.tar.bz2 && \
-    \
-    KERN_DIR=/linux-kernel/ make -C amd64/src/vboxguest-${VBOX_VERSION} && \
-    cp amd64/src/vboxguest-${VBOX_VERSION}/*.ko $ROOTFS/lib/modules/$KERNEL_VERSION-boot2docker/ && \
-    \
-    mkdir -p $ROOTFS/sbin && \
-    cp amd64/lib/VBoxGuestAdditions/mount.vboxsf amd64/sbin/VBoxService $ROOTFS/sbin/ && \
-    mkdir -p $ROOTFS/bin && \
-    cp amd64/bin/VBoxClient amd64/bin/VBoxControl $ROOTFS/bin/
+# ENV VBOX_VERSION 5.0.10
+# RUN mkdir -p /vboxguest && \
+#    cd /vboxguest && \
+#    \
+#    curl -fL -o vboxguest.iso http://download.virtualbox.org/virtualbox/${VBOX_VERSION}/VBoxGuestAdditions_${VBOX_VERSION}.iso && \
+#    7z x vboxguest.iso -ir'!VBoxLinuxAdditions.run' && \
+#    rm vboxguest.iso && \
+#    \
+#    sh VBoxLinuxAdditions.run --noexec --target . && \
+#    mkdir amd64 && tar -C amd64 -xjf VBoxGuestAdditions-amd64.tar.bz2 && \
+#    rm VBoxGuestAdditions*.tar.bz2 && \
+#    \
+#    KERN_DIR=/linux-kernel/ make -C amd64/src/vboxguest-${VBOX_VERSION} && \
+#    cp amd64/src/vboxguest-${VBOX_VERSION}/*.ko $ROOTFS/lib/modules/$KERNEL_VERSION-boot2docker/ && \
+#    \
+#    mkdir -p $ROOTFS/sbin && \
+#    cp amd64/lib/VBoxGuestAdditions/mount.vboxsf amd64/sbin/VBoxService $ROOTFS/sbin/ && \
+#    mkdir -p $ROOTFS/bin && \
+#    cp amd64/bin/VBoxClient amd64/bin/VBoxControl $ROOTFS/bin/
 
 # Install build dependencies for VMware Tools
 RUN apt-get update && apt-get install -y \
@@ -184,6 +185,7 @@ RUN apt-get update && apt-get install -y \
         libtool \
     && rm -rf /var/lib/apt/lists/*
 
+### User Open VM Tools
 # Build VMware Tools
 ENV OVT_VERSION 10.0.0-3000743
 
@@ -213,32 +215,35 @@ RUN curl -fL -o /tmp/${LIBDNET}.zip https://github.com/dugsong/libdnet/archive/$
 RUN cd $ROOTFS && cd usr/local/lib && ln -s libdnet.1 libdumbnet.so.1 &&\
     cd $ROOTFS && ln -s lib lib64
 
+
+### Removing Parallels Tools. Not needed.
 # Download and build Parallels Tools
-ENV PRL_MAJOR 11
-ENV PRL_VERSION 11.0.2
-ENV PRL_BUILD 31348
+#ENV PRL_MAJOR 11
+#ENV PRL_VERSION 11.0.2
+#ENV PRL_BUILD 31348
 
-RUN mkdir -p /prl_tools && \
-    curl -fL http://download.parallels.com/desktop/v${PRL_MAJOR}/${PRL_VERSION}/ParallelsTools-${PRL_VERSION}-${PRL_BUILD}-boot2docker.tar.gz \
-        | tar -xzC /prl_tools --strip-components 1 &&\
-    cd /prl_tools &&\
-    cp -Rv tools/* $ROOTFS &&\
-    \
-    KERNEL_DIR=/linux-kernel/ KVER=$KERNEL_VERSION SRC=/linux-kernel/ PRL_FREEZE_SKIP=1 \
-    make -C kmods/ -f Makefile.kmods installme &&\
-    \
-    find kmods/ -name \*.ko -exec cp {} $ROOTFS/lib/modules/$KERNEL_VERSION-boot2docker/ \;
+#RUN mkdir -p /prl_tools && \
+#    curl -fL http://download.parallels.com/desktop/v${PRL_MAJOR}/${PRL_VERSION}/ParallelsTools-${PRL_VERSION}-${PRL_BUILD}-boot2docker.tar.gz \
+#        | tar -xzC /prl_tools --strip-components 1 &&\
+#    cd /prl_tools &&\
+#    cp -Rv tools/* $ROOTFS &&\
+#    \
+#    KERNEL_DIR=/linux-kernel/ KVER=$KERNEL_VERSION SRC=/linux-kernel/ PRL_FREEZE_SKIP=1 \
+#    make -C kmods/ -f Makefile.kmods installme &&\
+#    \
+#    find kmods/ -name \*.ko -exec cp {} $ROOTFS/lib/modules/$KERNEL_VERSION-boot2docker/ \;
 
+### Removing XenServer Tools. Not Needed.
 # Build XenServer Tools
-ENV XEN_REPO https://github.com/xenserver/xe-guest-utilities
-ENV XEN_BRANCH boot2docker
-ENV XEN_COMMIT 4a9417fa61a5ca46676b7073fdb9181fe77ba56e
+#ENV XEN_REPO https://github.com/xenserver/xe-guest-utilities
+#ENV XEN_BRANCH boot2docker
+#ENV XEN_COMMIT 4a9417fa61a5ca46676b7073fdb9181fe77ba56e
 
-RUN git clone -b "$XEN_BRANCH" "$XEN_REPO" /xentools \
-    && cd /xentools \
-    && git checkout -q "$XEN_COMMIT" \
-    && make \
-    && tar xvf build/dist/*.tgz -C $ROOTFS/
+#RUN git clone -b "$XEN_BRANCH" "$XEN_REPO" /xentools \
+#    && cd /xentools \
+#    && git checkout -q "$XEN_COMMIT" \
+#    && make \
+#    && tar xvf build/dist/*.tgz -C $ROOTFS/
 
 # Make sure that all the modules we might have added are recognized (especially VBox guest additions)
 RUN depmod -a -b $ROOTFS $KERNEL_VERSION-boot2docker
