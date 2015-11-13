@@ -20,7 +20,7 @@ RUN apt-get update && apt-get -y install  unzip \
                         p7zip-full
 
 # Install Chef Client
-RUN curl -L https://getchef.com/chef/install.sh | bash -s -- -v <%= version %> -P container
+RUN curl -L https://getchef.com/chef/install.sh | bash -s -- -v 12.5.1 -P container
 
 # https://www.kernel.org/
 ENV KERNEL_VERSION  4.1.13
