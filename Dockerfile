@@ -17,10 +17,11 @@ RUN apt-get update && apt-get -y install  unzip \
                         isolinux \
                         automake \
                         pkg-config \
-                        p7zip-full
+                        p7zip-full \
+                        libjson-perl
 
 # Install Chef Client
-RUN curl -L https://getchef.com/chef/install.sh | bash -s -- -v 12.5.1 -P container
+RUN curl -L https://getchef.com/chef/install.sh | bash -s -- -P container
 
 # https://www.kernel.org/
 ENV KERNEL_VERSION  4.1.13
